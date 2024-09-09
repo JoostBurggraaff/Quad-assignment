@@ -1,0 +1,85 @@
+<div class="container">
+  <h2>Trivia Game</h2>
+
+  <mat-card>
+    <mat-card-title>Configure your quiz</mat-card-title>
+    <mat-card-content>
+      <div class="row">
+        <div class="col">
+          <mat-form-field appearance="fill">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" [(ngModel)]="options.amount" name="amount" min="1" max="50" required #amountInput="ngModel">
+            <mat-error *ngIf="amountInput.invalid && (amountInput.dirty || amountInput.touched)">
+              Amount must be between 1 and 50.
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col">
+          <mat-form-field appearance="fill">
+            <mat-label>Category</mat-label>
+            <mat-select [(ngModel)]="options.category" name="category">
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col">
+          <mat-form-field appearance="fill">
+            <mat-label>Difficulty</mat-label>
+            <mat-select [(ngModel)]="options.difficulty" name="difficulty">
+              <mat-option *ngFor="let level of difficulties" [value]="level">
+                {{ level }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col">
+          <mat-form-field appearance="fill">
+            <mat-label>Type</mat-label>
+            <mat-select [(ngModel)]="options.type" name="type">
+              <mat-option value="any">Any</mat-option>
+              <mat-option value="multiple">Multiple Choice</mat-option>
+              <mat-option value="boolean">True/False</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <button mat-raised-button color="secondary" type="submit" class="m-2" [disabled]="amountInput.invalid" (click)="loadQuestions()">Load Questions</button>
+      <button mat-raised-button color="primary" type="submit" class="m-2" (click)="submitAnswers()">Submit Answers</button>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="questions.length === 0">
+    <p>Loading questions...</p>
+  </div>
+
+  <div *ngIf="questions.length > 0">
+    <div *ngFor="let question of questions" class="question-box">
+      <mat-card>
+        <mat-card-title [innerHTML]="question.sanitizedQuestion"></mat-card-title>
+        <mat-card-content>
+          <mat-radio-group (change)="selectAnswer(question.plainQuestion, $event.value)">
+            <mat-radio-button *ngFor="let option of question.options" [value]="option.plainOption">
+              <div [innerHTML]="option.sanitizedOption"></div>
+            </mat-radio-button>
+          </mat-radio-group>
+        </mat-card-content>
+        <mat-card-footer *ngIf="result && result[question.plainQuestion]">
+          <p [ngStyle]="{'color': result[question.plainQuestion] === 'correct' ? 'green' : 'red'}">
+            {{ result[question.plainQuestion] === 'correct' ? 'Correct' : 'Incorrect' }}
+          </p>
+        </mat-card-footer>
+      </mat-card>
+    </div>
+
+    <div *ngIf="questions.length > 5">
+      <button mat-raised-button color="secondary" type="submit" class="m-2" (click)="loadQuestions()">Load Questions</button>
+      <button mat-raised-button color="primary" type="submit" class="m-2" (click)="submitAnswers()">Submit Answers</button>
+    </div>
+  </div>
+</div>
